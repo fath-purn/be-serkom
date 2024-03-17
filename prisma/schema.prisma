@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// model User {
+//   id   Int    @id @default(autoincrement())
+//   nama String
+// }
+
+// Nilai
+model Nilai {
+  id        Int         @id @default(autoincrement())
+  nim       Int         @unique
+  ipk       Float
+  Mahasiswa Mahasiswa[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("nilai")
+}
+
+// Mahasiswa
+model Mahasiswa {
+  id            Int      @id @default(autoincrement())
+  nim           Int      @unique
+  nama_depan    String
+  nama_belakang String
+  email         String   @unique
+  no_hp         String
+  semester      Int
+  beasiswa      Beasiswa
+  status        Status
+  nilai         Nilai    @relation(fields: [nim], references: [nim])
+  media         Media[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("mahasiswa")
+}
+
+// Media
+model Media {
+  id           Int       @id @default(autoincrement())
+  nama         String
+  url          String
+  id_mahasiswa Int
+  mahasiswa    Mahasiswa @relation(fields: [id_mahasiswa], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("media")
+}
+
+// Enum Beasiswa
+enum Beasiswa {
+  akademik
+  non_akademik
+}
+
+// Enum Status
+enum Status {
+  Belum_daftar
+  Pending
+  Diterima
+  Ditolak
+}
