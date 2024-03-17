@@ -13,6 +13,5 @@
   "routes": [
     { "src": "/(.*)", "dest": "/app.js" },
     { "src": "/public/", "dest": "/" }
-  ],
-  "watchIgnored": ["**/public/**"]
+  ]
 }
