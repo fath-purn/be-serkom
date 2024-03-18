@@ -1,4 +1,13 @@
-const {PrismaClient} = require('@prisma/client')
-const prisma = new PrismaClient()
+/**
+ * Deskripsi: Inisialisasi PrismaClient untuk berinteraksi dengan database menggunakan Prisma ORM.
+ * 
+ * @author Fatkhurrohman Purnomo / @fath-purn
+ * @date 18 Maret 2024
+ */
 
-module.exports = prisma
+const { PrismaClient } = require('@prisma/client');
+
+// Inisialisasi PrismaClient
+const prisma = new PrismaClient();
+
+module.exports = prisma;
