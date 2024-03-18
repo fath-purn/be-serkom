@@ -1,17 +1,6 @@
 {
-  "version": 2,
-  "name": "serkom",
-  "builds": [
-    {
-      "src": "app.js",
-      "use": "@vercel/node",
-      "config": {
-        "outputPath": "dist"
-      }
-    }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/app.js" },
-    { "src": "/public/", "dest": "/" }
-  ]
-}
+    "version": 2,
+    "name": "serkom",
+    "builds": [{ "src": "app.js", "use": "@vercel/node" }],
+    "routes": [{ "src": "/(.*)", "dest": "/app.js" }]
+  }

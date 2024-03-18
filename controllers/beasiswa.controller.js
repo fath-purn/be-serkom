@@ -2,23 +2,22 @@ const prisma = require("../libs/prisma");
 const { mahasiswaSchema } = require("../validations/validation");
 
 function toIndonesianPhoneNumber(phoneNumber) {
-    let digitsOnly = phoneNumber.replace(/\D/g, "");
-  
-    if (digitsOnly.startsWith("0")) {
-      return "62" + digitsOnly.substring(1);
-    }
+  let digitsOnly = phoneNumber.replace(/\D/g, "");
 
-    if (digitsOnly.startsWith("8")) {
-      return "62" + digitsOnly;
-    }
-  
-    if (!digitsOnly.startsWith("62")) {
-      return "62" + digitsOnly;
-    }
-    
-  
-    return digitsOnly;
+  if (digitsOnly.startsWith("0")) {
+    return "62" + digitsOnly.substring(1);
   }
+
+  if (digitsOnly.startsWith("8")) {
+    return "62" + digitsOnly;
+  }
+
+  if (!digitsOnly.startsWith("62")) {
+    return "62" + digitsOnly;
+  }
+
+  return digitsOnly;
+}
 
 const getBeasiswa = async (req, res, next) => {
   try {
@@ -31,6 +30,7 @@ const getBeasiswa = async (req, res, next) => {
         },
         include: {
           media: true,
+          nilai: true,
         },
       });
 
@@ -66,8 +66,6 @@ const create = async (req, res, next) => {
       status,
     } = value;
 
-    console.log(value, "value");
-
     if (error) {
       return res.status(400).json({
         success: false,
@@ -78,34 +76,49 @@ const create = async (req, res, next) => {
     }
 
     const checkNim = await prisma.nilai.findUnique({
-        where: {
-          nim: Number(nim),
-        },
+      where: {
+        nim: Number(nim),
+      },
+    });
+
+    if (!checkNim) {
+      return res.status(400).json({
+        success: false,
+        message: "Bad Request!",
+        err: "NIM tidak ditemukan",
+        data: null,
       });
-  
-      if(!checkNim) {
-        return res.status(400).json({
-          success: false,
-          message: "Bad Request!",
-          err: "NIM tidak ditemukan",
-          data: null,
-        });
-      }
+    }
 
     const checkEmail = await prisma.mahasiswa.findUnique({
-        where: {
-          email: email,
-        },
+      where: {
+        email: email,
+      },
+    });
+
+    if (checkEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "Bad Request!",
+        err: "Email yang di masukkan sudah digunakan",
+        data: null,
       });
-  
-      if(checkEmail) {
-        return res.status(400).json({
-          success: false,
-          message: "Bad Request!",
-          err: "Email yang di masukkan sudah ada",
-          data: null,
-        });
-      }
+    }
+
+    const checkNimMahasiswa = await prisma.mahasiswa.findUnique({
+      where: {
+        nim: Number(nim),
+      },
+    });
+
+    if (checkNimMahasiswa) {
+      return res.status(400).json({
+        success: false,
+        message: "Bad Request!",
+        err: "Kamu sudah terdaftar di program beasiswa",
+        data: null,
+      });
+    }
 
     let indonesianPhoneNumber = toIndonesianPhoneNumber(no_hp);
 
@@ -122,17 +135,17 @@ const create = async (req, res, next) => {
       },
     });
 
-    let folder = req.file.destination.split('public/')[1];
+    let folder = req.file.destination.split("public/")[1];
     const nama = req.file.filename;
-    const fileUrl = `${req.protocol}://${req.get('host')}/${nama}`;
+    const fileUrl = `${req.protocol}://${req.get("host")}/${nama}`;
 
     await prisma.media.create({
-        data: {
-            id_mahasiswa: create.id,
-            url: fileUrl,
-            nama: nama,
-        }
-    })
+      data: {
+        id_mahasiswa: create.id,
+        url: fileUrl,
+        nama: nama,
+      },
+    });
 
     res.status(200).json({
       success: true,

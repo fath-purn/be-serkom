@@ -55,6 +55,7 @@ model Media {
   url          String
   id_mahasiswa Int
   mahasiswa    Mahasiswa @relation(fields: [id_mahasiswa], references: [id])
+  
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
