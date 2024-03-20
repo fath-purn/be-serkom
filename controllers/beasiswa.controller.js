@@ -75,6 +75,58 @@ const getBeasiswa = async (req, res, next) => {
 };
 
 /**
+ * Deskripsi: Mengambil data beasiswa berdasarkan nim dari database.
+ * @param {object} req Objek permintaan dari klien.
+ * @param {object} res Objek respons yang akan dikirimkan ke klien.
+ * @param {function} next Fungsi untuk memanggil middleware berikutnya.
+ * @returns {object} Objek respons yang berisi data beasiswa dari database.
+ */
+const chart = async (req, res, next) => {
+  try {
+      // Mencari nim di dalam database mahasiswa dan relasinya
+      const belumDaftarCount = await prisma.mahasiswa.count({
+        where: { status: 'Belum_daftar' }
+      });
+  
+      const pendingCount = await prisma.mahasiswa.count({
+        where: { status: 'Pending' }
+      });
+  
+      const diterimaCount = await prisma.mahasiswa.count({
+        where: { status: 'Diterima' }
+      });
+  
+      const ditolakCount = await prisma.mahasiswa.count({
+        where: { status: 'Ditolak' }
+      });
+  
+      const data = [
+        { id: 0, value: belumDaftarCount, label: 'Belum Daftar' },
+        { id: 1, value: pendingCount, label: 'Belum di Verifikasi' },
+        { id: 2, value: diterimaCount, label: 'Diterima' },
+        { id: 3, value: ditolakCount, label: 'Ditolak' }
+      ];
+
+      // Mengembalikan data yang diambil dari database dan mengembalikan status 200
+      res.status(200).json({
+        success: true,
+        message: "OK",
+        err: null,
+        data: data,
+      });
+  } catch (err) {
+    // Jika data tidak ditemukan maka akan mengembalikan status 400
+    next();
+    return res.status(400).json({
+      success: false,
+      message: "Bad Request!",
+      err: err.message,
+      data: null,
+    });
+  }
+};
+
+/**
  * Deskripsi: Membuat data baru untuk mahasiswa dan beasiswa berdasarkan data yang diberikan.
  * @param {object} req Objek permintaan dari klien.
  * @param {object} res Objek respons yang akan dikirimkan ke klien.
@@ -208,8 +260,11 @@ const create = async (req, res, next) => {
   }
 };
 
+
+
 // Melakukan export fungsi
 module.exports = {
   getBeasiswa,
   create,
+  chart,
 };

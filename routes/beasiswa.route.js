@@ -14,10 +14,14 @@ const upload = require("../libs/multer"); // Memuat middleware multer untuk meng
 const { 
     getBeasiswa, // Mengimpor fungsi getBeasiswa dari controller
     create, // Mengimpor fungsi create dari controller
+    chart,
 } = require("../controllers/beasiswa.controller"); // Mengimpor controller beasiswa
 
 // Menentukan rute untuk mendapatkan data beasiswa
 router.get("/", getBeasiswa);
+
+// Menentukan rute untuk chart
+router.get("/chart", chart, chart);
 
 // Menentukan rute untuk menambahkan data beasiswa
 router.post("/add", upload.upload.single('file'), create);
